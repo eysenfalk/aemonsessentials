@@ -2,3 +2,6 @@
 	path = VintageStoryAPI
 	url = https://github.com/anegostudios/vsapi.git
 	branch = master
+[submodule "deepwiki-open"]
+	path = deepwiki-open
+	url = https://github.com/AsyncFuncAI/deepwiki-open.git
