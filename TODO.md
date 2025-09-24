@@ -211,7 +211,7 @@ Every file must include comprehensive comments explaining:
 ### Base Configuration Structure
 ```json
 {
-  "aemonEssentials": {
+  "AemonsEssentials": {
     "handbook": {
       "enabled": true,
       "rememberLastPage": true,
@@ -266,7 +266,7 @@ public class HandbookConfig
 
 ## File Structure Overview
 ```
-aemonessentials/
+AemonsEssentials/
 ├── source/
 │   ├── Common/
 │   │   ├── ModSystemBase.cs           // Shared mod system functionality

@@ -4,7 +4,7 @@
     <ModName>Aemon's Essentials</ModName>
     <ModType>code</ModType>
     <ModVersion>0.0.0</ModVersion>
-    <ModId>aemonessentials</ModId>
+  <ModId>aemonsessentials</ModId>
     <Description></Description>
     <Side>universal</Side>
     <RequiredOnClient>true</RequiredOnClient>
@@ -60,7 +60,7 @@
 
   <!-- Project item includes -->
   <ItemGroup>
-    <Folder Include="resources\assets\aemonessentials" />
+  <Folder Include="resources\assets\aemonsessentials" />
   </ItemGroup>
 
   <!-- Source code files are automatically included by .NET SDK -->

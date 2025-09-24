@@ -1,6 +1,6 @@
 using System;
 
-namespace AemonEssentials.HandbookMemory
+namespace AemonsEssentials.HandbookMemory
 {
     /// <summary>
     /// Configuration settings for the Smart Handbook Memory system.

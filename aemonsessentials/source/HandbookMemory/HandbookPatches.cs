@@ -2,7 +2,7 @@ using HarmonyLib;
 using Vintagestory.GameContent;
 using Vintagestory.API.Client;
 
-namespace AemonEssentials.HandbookMemory
+namespace AemonsEssentials.HandbookMemory
 {
     // Minimal patch: prevent GuiDialogHandbook from clearing its state when closed
     [HarmonyPatch]

@@ -1,9 +1,9 @@
 using Vintagestory.API.Common;
 using HarmonyLib;
 
-namespace AemonEssentials
+namespace AemonsEssentials
 {
-    public class AemonEssentialsMod : ModSystem
+    public class AemonsEssentialsMod : ModSystem
     {
         private Harmony? harmony;
 
@@ -14,7 +14,7 @@ namespace AemonEssentials
             api.Logger.Notification("Aemon's Essentials mod is starting up...");
 
             // Apply Harmony patches (single-file feature)
-            harmony = new Harmony("aemonessentials.handbookmemory");
+            harmony = new Harmony("aemonsessentials.handbookmemory");
             harmony.PatchAll();
 
             api.Logger.Notification("Aemon's Essentials mod started successfully!");
@@ -23,7 +23,7 @@ namespace AemonEssentials
         public override void Dispose()
         {
             // Remove Harmony patches on shutdown
-            harmony?.UnpatchAll("aemonessentials.handbookmemory");
+            harmony?.UnpatchAll("aemonsessentials.handbookmemory");
             base.Dispose();
         }
     }

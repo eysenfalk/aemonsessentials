@@ -1,4 +1,4 @@
-# AemonEssentials Debug Guide
+# AemonsEssentials Debug Guide
 
 ## VS Code Debugging Setup ✓
 
