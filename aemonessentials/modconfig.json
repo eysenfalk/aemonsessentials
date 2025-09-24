@@ -1,0 +1,6 @@
+{
+  "sneakDetectionMultiplier": 0.5,
+  "enableLineOfSight": true,
+  "debugLogging": false,
+  "logLevel": "Notification"
+}
