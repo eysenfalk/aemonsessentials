@@ -1,4 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Mod info -->
+  <PropertyGroup>
+    <ModName>aemonessentials</ModName>
+    <ModType>code</ModType>
+    <ModVersion>0.0.0</ModVersion>
+    <ModId>aemonessentials</ModId>
+    <Description></Description>
+    <Side>universal</Side>
+    <RequiredOnClient>true</RequiredOnClient>
+    <RequiredOnServer>true</RequiredOnServer>
+  </PropertyGroup>
+
+  <!-- Authors -->
+  <ItemGroup>
+    <ModInfoAuthors Include="Author" />
+  </ItemGroup>
+
+  <!-- Dependencies -->
+  <ItemGroup>
+    <Dependencies Include="game" Version="1.21.1" />
+  </ItemGroup>
+
   <!-- Project settings -->
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
