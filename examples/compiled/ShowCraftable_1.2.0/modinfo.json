@@ -1,0 +1,13 @@
+{
+  "type": "code",
+  "modid": "showcraftable",
+  "name": "ShowCraftable",
+  "authors": [
+    "Interzoneism"
+  ],
+  "description": "Scans nearby storage and tells you whats Craftable",
+  "dependencies": {
+    "game": ""
+  },
+  "Version": "1.2.0"
+}

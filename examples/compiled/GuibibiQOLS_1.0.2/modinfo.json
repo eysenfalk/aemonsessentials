@@ -1,0 +1,13 @@
+{
+    "type": "code",
+    "modid": "GuibibiQOLS",
+    "name": "Guibibi QOLs Mods",
+    "authors": [
+        "Guibibi"
+    ],
+  "description": "A list of small tweaks to improve the quality of life",
+    "version": "1.0.2",
+    "dependencies": {
+        "game": ""
+    }
+}

@@ -1,12 +1,8 @@
 {
   "aemonEssentials": {
-    "stealth": {
+    "handbook": {
       "enabled": true,
-      "sneakDetectionMultiplier": 0.5,
-      "enableLineOfSight": true,
-      "aiMemoryDurationSeconds": 5.0,
-      "debugLogging": false,
-      "performanceMode": false
+      "rememberLastPage": true
     }
   }
 }
