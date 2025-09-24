@@ -1,0 +1,4 @@
+﻿[submodule "VintageStoryAPI"]
+	path = VintageStoryAPI
+	url = https://github.com/anegostudios/vsapi.git
+	branch = master

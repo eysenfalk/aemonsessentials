@@ -1,0 +1,12 @@
+﻿{
+  "type": "code",
+  "modid": "aemonstealth",
+  "name": "Aemon's Stealth System",
+  "author": "Aemon",
+  "description": "Adds realistic stealth mechanics with sneak detection range reduction and line-of-sight blocking for entities.",
+  "version": "1.0.0",
+  "dependency": {
+    "game": "1.19.0"
+  },
+  "side": "Universal"
+}
