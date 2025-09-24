@@ -30,35 +30,16 @@ namespace AemonEssentials.Stealth
         {
             try
             {
-                // Find the concrete implementation of GetEntitiesAround
-                // This will likely be in ServerMain or ClientMain world implementation
-                Type?[] typesToCheck = new Type?[]
-                {
-                    Type.GetType("Vintagestory.Server.ServerMain+WorldAccessor"),
-                    Type.GetType("Vintagestory.Client.ClientMain+WorldAccessor"),
-                    Type.GetType("Vintagestory.Common.WorldAccessor")
-                };
-
-                foreach (Type? type in typesToCheck)
-                {
-                    if (type != null)
-                    {
-                        MethodInfo? method = type.GetMethod("GetEntitiesAround", 
-                            new Type[] { typeof(Vec3d), typeof(float), typeof(float), typeof(ActionConsumable<Entity>) });
-                        
-                        if (method != null)
-                        {
-                            harmony?.Patch(method,
-                                postfix: new HarmonyMethod(typeof(StealthPatches), nameof(StealthPatches.GetEntitiesAround_Postfix)));
-                            break;
-                        }
-                    }
-                }
+                // Let Harmony auto-detect and patch all implementations
+                // This is more reliable than trying to find specific types
+                harmony?.PatchAll(Assembly.GetExecutingAssembly());
+                
+                Console.WriteLine("[STEALTH] Harmony patches applied successfully");
             }
             catch (Exception e)
             {
                 // If direct patching fails, log and continue
-                Console.WriteLine($"Stealth: Could not patch GetEntitiesAround directly: {e.Message}");
+                Console.WriteLine($"Stealth: Could not apply Harmony patches: {e.Message}");
             }
         }
 

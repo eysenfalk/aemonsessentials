@@ -11,16 +11,20 @@ namespace AemonEssentials.Stealth
     /// <summary>
     /// Harmony patches for implementing stealth mechanics
     /// </summary>
-    [HarmonyPatch]
     public static class StealthPatches
     {
         /// <summary>
         /// Postfix patch for GetEntitiesAround to filter results based on stealth mechanics
         /// </summary>
         [HarmonyPostfix]
+        [HarmonyPatch("Vintagestory.Server.ServerSystemEntitySimulation", "GetEntitiesAround")]
+        [HarmonyPatch("Vintagestory.Client.Systems.EntitySimulation", "GetEntitiesAround")]
         public static void GetEntitiesAround_Postfix(Vec3d position, float horRange, float vertRange, ActionConsumable<Entity> matches, ref Entity[] __result)
         {
             if (__result == null || __result.Length == 0) return;
+
+            // DEBUG: Log when patch is called
+            Console.WriteLine($"[STEALTH PATCH] GetEntitiesAround called with {__result.Length} entities, range: {horRange}");
 
             try
             {

@@ -94,8 +94,8 @@ namespace AemonEssentials.Stealth
             // Calculate direction from observer to player
             Vec3d toPlayer = playerPos.Sub(observerPos).Normalize();
             
-            // Get observer's facing direction
-            float observerYaw = observer.BodyYaw;
+            // Get observer's facing direction - use ServerPos.Yaw which tracks movement properly
+            float observerYaw = observer.ServerPos.Yaw;
             Vec3d observerFacing = new Vec3d(Math.Sin(observerYaw), 0, Math.Cos(observerYaw)).Normalize();
             
             // Calculate angle between facing direction and direction to player
@@ -104,6 +104,10 @@ namespace AemonEssentials.Stealth
             
             // 90-degree FOV = 45 degrees each side = π/4 radians
             double fovHalfAngle = Math.PI / 4.0; // 45 degrees in radians
+            
+            // DEBUG: Log the calculation details
+            Console.WriteLine($"[FOV DEBUG] Observer yaw: {observerYaw:F3}, angle to player: {angleRadians * 180 / Math.PI:F1}°, half FOV: {fovHalfAngle * 180 / Math.PI:F1}°");
+            Console.WriteLine($"[FOV DEBUG] Observer facing: {observerFacing}, to player: {toPlayer}, dot: {dotProduct:F3}");
             
             return angleRadians <= fovHalfAngle;
         }
