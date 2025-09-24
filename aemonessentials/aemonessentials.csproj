@@ -63,6 +63,11 @@
     <Folder Include="resources\assets\aemonessentials" />
   </ItemGroup>
 
+  <!-- Source code files -->
+  <ItemGroup>
+    <Compile Include="source\**\*.cs" />
+  </ItemGroup>
+
   <!-- Formatting JSON files -->
   <PropertyGroup>
     <Scripts>$(ProjectDir)\scripts</Scripts>

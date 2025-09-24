@@ -1,6 +1,12 @@
 {
-  "sneakDetectionMultiplier": 0.5,
-  "enableLineOfSight": true,
-  "debugLogging": false,
-  "logLevel": "Notification"
+  "aemonEssentials": {
+    "stealth": {
+      "enabled": true,
+      "sneakDetectionMultiplier": 0.5,
+      "enableLineOfSight": true,
+      "aiMemoryDurationSeconds": 5.0,
+      "debugLogging": false,
+      "performanceMode": false
+    }
+  }
 }
