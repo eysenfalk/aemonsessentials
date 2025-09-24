@@ -2,29 +2,26 @@
 using Vintagestory.API.Server;
 using Vintagestory.API.Client;
 using Vintagestory.API.MathTools;
-using HarmonyLib;
 using System;
 
 namespace AemonEssentials.Stealth
 {
     public class StealthModSystem : ModSystem
     {
-        private Harmony harmony;
 
         public override void Start(ICoreAPI api)
         {
             base.Start(api);
 
-            // Initialize Harmony for patching
-            harmony = new Harmony("aemonessentials.stealth");
-            harmony.PatchAll();
-
-            api.Logger.Notification("Aemon's Stealth System loaded successfully");
+            // Note: Harmony patching removed due to abstract interface method issues
+            // Stealth mechanics will be applied through utility methods instead
+            
+            api.Logger.Notification("Aemon's Stealth System loaded successfully (without Harmony patches)");
         }
 
         public override void Dispose()
         {
-            harmony?.UnpatchAll("aemonessentials.stealth");
+            // No Harmony patches to clean up
         }
 
         // Utility method to check if player is sneaking
@@ -50,7 +47,7 @@ namespace AemonEssentials.Stealth
                 if (block != null && block.BlockMaterial != EnumBlockMaterial.Air)
                 {
                     // Check if block is solid and blocks vision
-                    if (block.SideSolid != null && block.SideSolid[BlockFacing.UP.Index])
+                    if (block.SideSolid[BlockFacing.UP.Index])
                     {
                         return false; // Line of sight blocked
                     }
