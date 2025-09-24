@@ -29,8 +29,8 @@ namespace AemonEssentials.Stealth
                 .WithArgs(api.ChatCommands.Parsers.OptionalWord("mode"))
                 .HandleWith(OnStealthDebugCmd);
             
-            // Register renderer
-            rendererId = api.Event.RegisterGameTickListener(OnRenderDebug, 50); // 20 FPS for debug overlay
+            // Register renderer - runs every frame when debug mode is on
+            rendererId = api.Event.RegisterGameTickListener(OnRenderDebug, 16); // ~60 FPS for smooth visualization
             
             api.Logger.Notification("Stealth Debug Renderer loaded");
         }
@@ -48,8 +48,14 @@ namespace AemonEssentials.Stealth
                 debugMode = mode.ToLower() == "on" || mode.ToLower() == "true" || mode == "1";
             }
             
-            string message = $"Stealth debug mode: {(debugMode ? "ON" : "OFF")}";
+            string message = $"Stealth debug visualization: {(debugMode ? "ON - Look for pink spheres around entities!" : "OFF")}";
             capi?.ShowChatMessage(message);
+            
+            if (debugMode)
+            {
+                capi?.ShowChatMessage("Pink spheres show detection range, green/red lines show line-of-sight");
+                capi?.ShowChatMessage("Yellow lines show entity view cones");
+            }
             
             return TextCommandResult.Success(message);
         }
@@ -61,15 +67,30 @@ namespace AemonEssentials.Stealth
             var player = capi.World.Player.Entity;
             var playerPos = player.Pos.XYZ;
             
-            // Get all entities around player for debugging
-            var entities = capi.World.GetEntitiesAround(playerPos, DETECTION_RANGE * 2, DETECTION_RANGE * 2, 
-                entity => entity != player && entity is EntityAgent);
+            // Get all entities around player for debugging - increased search range
+            var entities = capi.World.GetEntitiesAround(playerPos, 50f, 50f, 
+                entity => entity != player);
 
+            // Debug: Show how many entities we found
+            if (entities.Length == 0)
+            {
+                // Render a test sphere at player location to verify rendering works
+                RenderDetectionSphere(playerPos.Add(5, 0, 0), 3f, false);
+                return;
+            }
+
+            int agentCount = 0;
             foreach (var entity in entities)
             {
                 if (entity is EntityAgent agent)
                 {
+                    agentCount++;
                     RenderEntityDetectionDebug(agent, playerPos);
+                }
+                else
+                {
+                    // Render spheres around ANY entity for testing
+                    RenderDetectionSphere(entity.Pos.XYZ, 2f, false);
                 }
             }
             
@@ -103,19 +124,58 @@ namespace AemonEssentials.Stealth
 
         private void RenderDetectionSphere(Vec3d center, float radius, bool stealthMode)
         {
-            int color = stealthMode ? ColorUtil.ToRgba(100, 0, 255, 0) : ColorUtil.ToRgba(100, 255, 0, 0); // Green normal, Blue stealth
+            if (capi?.World?.Player?.Entity == null) return;
             
-            // Render horizontal circle
-            RenderCircle(center, radius, color, true);
+            // Use particles instead of lines - should be much more visible
+            var particleProps = new SimpleParticleProperties()
+            {
+                MinPos = center.Clone(),
+                AddPos = new Vec3d(0.1, 0.1, 0.1),
+                MinVelocity = new Vec3f(0, 0, 0),
+                AddVelocity = new Vec3f(0, 0, 0),
+                LifeLength = 0.5f,
+                GravityEffect = 0f,
+                MinSize = 0.1f,
+                MaxSize = 0.2f,
+                Color = ColorUtil.ToRgba(255, 255, 0, 255), // Bright magenta
+                OpacityEvolve = EvolvingNatFloat.create(EnumTransformFunction.LINEAR, -255),
+            };
             
-            // Render vertical circle
-            RenderCircle(center, radius, color, false);
+            // Create sphere outline with particles
+            int points = 60;
+            for (int i = 0; i < points; i++)
+            {
+                // Horizontal ring
+                float angle1 = (float)(i * 2 * Math.PI / points);
+                Vec3d ringPos = center.Add(Math.Cos(angle1) * radius, 0, Math.Sin(angle1) * radius);
+                particleProps.MinPos = ringPos.Clone();
+                capi.World.SpawnParticles(particleProps);
+                
+                // Vertical ring 1
+                Vec3d ringPos2 = center.Add(Math.Cos(angle1) * radius, Math.Sin(angle1) * radius, 0);
+                particleProps.MinPos = ringPos2.Clone();
+                capi.World.SpawnParticles(particleProps);
+                
+                // Vertical ring 2  
+                Vec3d ringPos3 = center.Add(0, Math.Cos(angle1) * radius, Math.Sin(angle1) * radius);
+                particleProps.MinPos = ringPos3.Clone();
+                capi.World.SpawnParticles(particleProps);
+            }
+            
+            // Add center marker particles
+            for (int y = -5; y <= 5; y++)
+            {
+                Vec3d markerPos = center.Add(0, y * 0.5, 0);
+                particleProps.MinPos = markerPos.Clone();
+                particleProps.Color = ColorUtil.ToRgba(255, 255, 255, 255); // White
+                capi.World.SpawnParticles(particleProps);
+            }
         }
 
         private void RenderCircle(Vec3d center, float radius, int color, bool horizontal)
         {
             var points = new List<Vec3d>();
-            int segments = 32;
+            int segments = 24; // Reduced for better performance
             
             for (int i = 0; i <= segments; i++)
             {
@@ -137,14 +197,56 @@ namespace AemonEssentials.Stealth
             // Render lines between consecutive points
             if (capi?.World?.Player?.Entity != null)
             {
-                var origin = new BlockPos((int)capi.World.Player.Entity.Pos.X, (int)capi.World.Player.Entity.Pos.Y, (int)capi.World.Player.Entity.Pos.Z);
+                var playerPos = capi.World.Player.Entity.Pos.XYZ;
+                var origin = new BlockPos((int)playerPos.X, (int)playerPos.Y, (int)playerPos.Z);
                 
                 for (int i = 0; i < points.Count - 1; i++)
                 {
                     var pos1 = points[i];
                     var pos2 = points[i + 1];
                     
-                    capi.Render.RenderLine(origin, 
+                    capi.Render.RenderLine(origin,
+                        (float)pos1.X, (float)pos1.Y, (float)pos1.Z,
+                        (float)pos2.X, (float)pos2.Y, (float)pos2.Z, 
+                        color);
+                }
+            }
+        }
+
+        private void RenderRotatedCircle(Vec3d center, float radius, int color, float rotationAngle)
+        {
+            var points = new List<Vec3d>();
+            int segments = 24;
+            
+            for (int i = 0; i <= segments; i++)
+            {
+                float angle = (float)(i * 2 * Math.PI / segments);
+                
+                // Create circle in XZ plane, then rotate
+                float x = (float)(Math.Cos(angle) * radius);
+                float z = (float)(Math.Sin(angle) * radius);
+                float y = 0;
+                
+                // Apply rotation around Y axis
+                float rotatedX = x * (float)Math.Cos(rotationAngle) - z * (float)Math.Sin(rotationAngle);
+                float rotatedZ = x * (float)Math.Sin(rotationAngle) + z * (float)Math.Cos(rotationAngle);
+                
+                Vec3d point = center.Add(rotatedX, y, rotatedZ);
+                points.Add(point);
+            }
+            
+            // Render the rotated circle
+            if (capi?.World?.Player?.Entity != null)
+            {
+                var playerPos = capi.World.Player.Entity.Pos.XYZ;
+                var origin = new BlockPos((int)playerPos.X, (int)playerPos.Y, (int)playerPos.Z);
+                
+                for (int i = 0; i < points.Count - 1; i++)
+                {
+                    var pos1 = points[i];
+                    var pos2 = points[i + 1];
+                    
+                    capi.Render.RenderLine(origin,
                         (float)pos1.X, (float)pos1.Y, (float)pos1.Z,
                         (float)pos2.X, (float)pos2.Y, (float)pos2.Z, 
                         color);
@@ -204,11 +306,20 @@ namespace AemonEssentials.Stealth
                 ColorUtil.ToRgba(255, 0, 255, 0) :  // Green = clear LOS
                 ColorUtil.ToRgba(255, 255, 0, 0);   // Red = blocked LOS
                 
-            var origin = new BlockPos((int)capi.World.Player.Entity.Pos.X, (int)capi.World.Player.Entity.Pos.Y, (int)capi.World.Player.Entity.Pos.Z);
-            capi.Render.RenderLine(origin,
-                (float)fromPos.X, (float)fromPos.Y, (float)fromPos.Z,
-                (float)toPos.X, (float)toPos.Y, (float)toPos.Z,
-                color);
+            var playerPos = capi.World.Player.Entity.Pos.XYZ;
+            var origin = new BlockPos((int)playerPos.X, (int)playerPos.Y, (int)playerPos.Z);
+            
+            // Render thick line by drawing multiple parallel lines
+            for (int offset = -1; offset <= 1; offset++)
+            {
+                Vec3d offsetFrom = fromPos.Add(0.1f * offset, 0, 0);
+                Vec3d offsetTo = toPos.Add(0.1f * offset, 0, 0);
+                
+                capi.Render.RenderLine(origin,
+                    (float)offsetFrom.X, (float)offsetFrom.Y, (float)offsetFrom.Z,
+                    (float)offsetTo.X, (float)offsetTo.Y, (float)offsetTo.Z,
+                    color);
+            }
         }
 
         private void RenderPlayerStealthStatus(EntityPlayer player)
